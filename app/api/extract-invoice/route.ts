@@ -23,18 +23,22 @@ export async function POST(request: Request) {
     .download(filePath);
 
   if (downloadError || !fileData) {
+    console.error("[extract] Storage download failed:", downloadError);
     return NextResponse.json({ error: "File download failed" }, { status: 500 });
   }
 
   // Convert to base64
   const arrayBuffer = await fileData.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
+  console.log("[extract] File downloaded, size:", arrayBuffer.byteLength, "mimeType:", mimeType);
 
   // Extract with Gemini
   let extracted;
   try {
     extracted = await extractInvoiceData(base64, mimeType);
+    console.log("[extract] Gemini extraction success:", extracted);
   } catch (err) {
+    console.error("[extract] Gemini extraction error:", err);
     await supabase.from("invoices").update({ status: "error" }).eq("id", invoiceId);
     return NextResponse.json({ error: "Extraction failed", detail: String(err) }, { status: 500 });
   }
