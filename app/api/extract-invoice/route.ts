@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { extractInvoiceData } from "@/lib/gemini";
+import { extractInvoiceData } from "@/lib/mistral";
 import { getQuarterFromDate } from "@/lib/types";
 import { NextResponse } from "next/server";
 
@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     }
 
     // Check env var is present
-    if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json({ error: "GEMINI_API_KEY not set" }, { status: 500 });
+    if (!process.env.MISTRAL_API_KEY) {
+      return NextResponse.json({ error: "MISTRAL_API_KEY not set" }, { status: 500 });
     }
 
     // Download file from Supabase Storage
