@@ -205,7 +205,7 @@ export default function InvoicePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -215,13 +215,13 @@ export default function InvoicePage() {
   const isPdf = invoice.file_type === "pdf";
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-zinc-200 sticky top-0 z-10">
+      <header className="bg-background/80 backdrop-blur border-b border-border sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -255,7 +255,7 @@ export default function InvoicePage() {
               Save
             </Button>
             <button
-              className="p-2 rounded-md text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              className="p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/8 transition-colors"
               onClick={() => setDeleteDialogOpen(true)}
             >
               <Trash2 className="h-4 w-4" />
@@ -267,11 +267,11 @@ export default function InvoicePage() {
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* File preview */}
-          <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-zinc-100 flex items-center justify-between">
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-zinc-400" />
-                <span className="text-sm font-medium text-zinc-700 truncate max-w-xs">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium truncate max-w-xs">
                   {invoice.file_name}
                 </span>
               </div>
@@ -280,13 +280,13 @@ export default function InvoicePage() {
                   href={fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-zinc-400 hover:text-zinc-700 transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
               )}
             </div>
-            <div className="aspect-[3/4] bg-zinc-100 flex items-center justify-center">
+            <div className="aspect-[3/4] bg-muted flex items-center justify-center">
               {fileUrl ? (
                 isPdf ? (
                   <iframe
@@ -303,7 +303,7 @@ export default function InvoicePage() {
                   />
                 )
               ) : (
-                <div className="text-center text-zinc-400">
+                <div className="text-center text-muted-foreground">
                   <FileText className="h-12 w-12 mx-auto mb-2" />
                   <p className="text-sm">Preview unavailable</p>
                 </div>
@@ -312,9 +312,9 @@ export default function InvoicePage() {
           </div>
 
           {/* Editable fields */}
-          <div className="bg-white border border-zinc-200 rounded-xl p-5 space-y-4">
+          <div className="bg-card border border-border rounded-xl p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-zinc-900">Invoice data</h2>
+              <h2 className="text-sm font-semibold">Extracted details</h2>
               {invoice.status === "processing" && (
                 <Badge variant="secondary" className="text-xs gap-1">
                   <Loader2 className="h-2.5 w-2.5 animate-spin" />
@@ -460,7 +460,7 @@ export default function InvoicePage() {
                 onChange={(e) => set("notes", e.target.value)}
                 placeholder="Any additional notes…"
                 rows={3}
-                className="w-full text-sm rounded-md border border-zinc-200 px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                className="w-full text-sm rounded-md border border-border bg-transparent px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-foreground placeholder:text-muted-foreground"
               />
             </div>
 

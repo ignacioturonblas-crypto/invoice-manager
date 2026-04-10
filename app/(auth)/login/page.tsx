@@ -32,14 +32,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Invoice Manager</h1>
-          <p className="text-sm text-zinc-500 mt-1">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4 bg-white border border-zinc-200 rounded-xl p-6 shadow-sm">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
