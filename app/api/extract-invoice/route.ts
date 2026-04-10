@@ -3,6 +3,8 @@ import { extractInvoiceData } from "@/lib/gemini";
 import { getQuarterFromDate } from "@/lib/types";
 import { NextResponse } from "next/server";
 
+export const maxDuration = 60; // seconds — Vercel hobby allows up to 60s
+
 export async function POST(request: Request) {
   const supabase = await createClient();
 
