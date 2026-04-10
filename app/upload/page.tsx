@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -119,13 +119,20 @@ export default function UploadPage() {
 
   const allDone = files.length > 0 && files.every((f) => f.status === "done" || f.status === "error");
 
+  // Auto-redirect 1.5s after all files finish
+  useEffect(() => {
+    if (!allDone) return;
+    const t = setTimeout(() => router.push("/dashboard"), 1500);
+    return () => clearTimeout(t);
+  }, [allDone, router]);
+
   return (
-    <div className="min-h-screen bg-zinc-50 p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-semibold">Upload Invoices</h1>
-            <p className="text-sm text-zinc-500 mt-0.5">PDF or photos — we'll extract everything automatically</p>
+            <p className="text-sm text-muted-foreground mt-0.5">PDF or photos — we'll extract everything automatically</p>
           </div>
           <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
             Back
@@ -137,21 +144,21 @@ export default function UploadPage() {
           {...getRootProps()}
           className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${
             isDragActive
-              ? "border-zinc-900 bg-zinc-100"
-              : "border-zinc-300 bg-white hover:border-zinc-400 hover:bg-zinc-50"
+              ? "border-primary bg-accent"
+              : "border-border bg-card hover:border-foreground/30 hover:bg-accent/50"
           }`}
         >
           <input {...getInputProps()} />
-          <Upload className="mx-auto h-10 w-10 text-zinc-400 mb-3" />
-          <p className="text-sm font-medium text-zinc-700">
+          <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+          <p className="text-sm font-medium text-foreground">
             {isDragActive ? "Drop files here" : "Drag & drop invoices here"}
           </p>
-          <p className="text-xs text-zinc-400 mt-1">PDF, JPG, PNG — multiple files supported</p>
+          <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG — multiple files supported</p>
         </div>
 
         {/* Camera button for mobile */}
         <div className="mt-3">
-          <label className="flex items-center justify-center gap-2 w-full border border-zinc-200 rounded-xl p-3 bg-white cursor-pointer hover:bg-zinc-50 transition-colors text-sm font-medium text-zinc-700">
+          <label className="flex items-center justify-center gap-2 w-full border border-border rounded-xl p-3 bg-card cursor-pointer hover:bg-accent/50 transition-colors text-sm font-medium text-foreground">
             <Camera className="h-4 w-4" />
             Take a photo
             <input
@@ -176,17 +183,17 @@ export default function UploadPage() {
             {files.map((f) => (
               <div
                 key={f.name}
-                className="flex items-center gap-3 bg-white border border-zinc-200 rounded-lg px-4 py-3"
+                className="flex items-center gap-3 bg-card border border-border rounded-lg px-4 py-3"
               >
-                <FileText className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span className="text-sm text-zinc-700 truncate flex-1">{f.name}</span>
+                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="text-sm text-foreground truncate flex-1">{f.name}</span>
                 {f.status === "uploading" && (
-                  <span className="text-xs text-zinc-400 flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
                     <Loader2 className="h-3 w-3 animate-spin" /> Uploading
                   </span>
                 )}
                 {f.status === "extracting" && (
-                  <span className="text-xs text-blue-600 flex items-center gap-1">
+                  <span className="text-xs text-primary flex items-center gap-1">
                     <Loader2 className="h-3 w-3 animate-spin" /> Extracting
                   </span>
                 )}
@@ -202,8 +209,8 @@ export default function UploadPage() {
         )}
 
         {allDone && (
-          <Button className="w-full mt-4" onClick={() => router.push("/dashboard")}>
-            Go to Dashboard
+          <Button variant="outline" size="sm" className="w-full mt-4" onClick={() => router.push("/dashboard")}>
+            Go to Dashboard now
           </Button>
         )}
       </div>
