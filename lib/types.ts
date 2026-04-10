@@ -1,0 +1,50 @@
+export type InvoiceType = "payment" | "income";
+export type Quarter = "T1" | "T2" | "T3" | "T4";
+export type InvoiceStatus = "processing" | "done" | "error";
+
+export interface Invoice {
+  id: string;
+  uploaded_by: string | null;
+  file_path: string;
+  file_name: string;
+  file_type: string | null;
+  type: InvoiceType;
+  vendor: string | null;
+  date: string | null;
+  amount: number | null;
+  currency: string;
+  invoice_number: string | null;
+  tax_amount: number | null;
+  quarter: Quarter | null;
+  year: number | null;
+  category: string | null;
+  metadata: Record<string, unknown>;
+  notes: string | null;
+  status: InvoiceStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExtractedInvoiceData {
+  vendor: string | null;
+  date: string | null; // ISO format YYYY-MM-DD
+  amount: number | null;
+  currency: string | null;
+  invoice_number: string | null;
+  tax_amount: number | null;
+  type: InvoiceType;
+  line_items: Array<{ description: string; quantity?: number; unit_price?: number; total?: number }>;
+  raw: Record<string, unknown>;
+}
+
+export function getQuarterFromDate(dateStr: string): { quarter: Quarter; year: number } | null {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return null;
+
+  const month = date.getMonth() + 1; // 1-12
+  const year = date.getFullYear();
+  const quarter: Quarter =
+    month <= 3 ? "T1" : month <= 6 ? "T2" : month <= 9 ? "T3" : "T4";
+
+  return { quarter, year };
+}
