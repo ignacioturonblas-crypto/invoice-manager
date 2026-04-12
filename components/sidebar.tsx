@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { FileText, CreditCard, Package, Briefcase, LogOut } from "lucide-react"
 import { Sheet } from "@/components/ui/sheet"
+import { MassioLogo } from "@/components/massio-logo"
 
 interface SidebarProps {
   userEmail: string | null
@@ -34,14 +35,8 @@ function SidebarBody({
   return (
     <div className="flex flex-col h-full bg-sidebar">
       {/* Logo */}
-      <div className="h-12 flex items-center gap-2.5 px-4 border-b border-sidebar-border shrink-0">
-        {/* Icon mark */}
-        <div className="size-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
-          <FileText className="size-3.5 text-sidebar-primary" />
-        </div>
-        <span className="text-[13px] font-semibold text-sidebar-foreground tracking-tight">
-          Invoice Manager
-        </span>
+      <div className="h-12 flex items-center px-4 border-b border-sidebar-border shrink-0">
+        <MassioLogo width={72} className="text-sidebar-foreground" />
       </div>
 
       {/* Nav */}

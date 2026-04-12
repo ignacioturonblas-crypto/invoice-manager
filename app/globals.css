@@ -92,7 +92,7 @@
   --chart-4: oklch(0.78 0.07 265);
   --chart-5: oklch(0.88 0.03 265);
 
-  --radius: 0.5rem;
+  --radius: 0.25rem; /* Square Maker: 4px base radius — tighter, more functional */
 
   /* Sidebar — near-black, no color tint (Intercom-style dark sidebar) */
   --sidebar:                    oklch(0.14 0.006 80);   /* near-black warm */

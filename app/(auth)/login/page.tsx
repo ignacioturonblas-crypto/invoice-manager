@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
+import { MassioLogo } from "@/components/massio-logo"
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,8 +36,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Invoice Manager</h1>
+        <div className="mb-8 flex flex-col items-center gap-3">
+          <MassioLogo width={96} className="text-foreground" />
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
