@@ -26,7 +26,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
       : (TITLES[pathname] ?? "Invoice Manager")
 
   return (
-    <header className="h-14 border-b border-border bg-background/90 backdrop-blur sticky top-0 z-10 flex items-center px-4 gap-3 shrink-0">
+    <header className="h-12 border-b border-border bg-card sticky top-0 z-10 flex items-center px-4 gap-3 shrink-0">
       <button
         className="lg:hidden p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         onClick={onMenuClick}

@@ -34,7 +34,7 @@ function SidebarBody({
   return (
     <div className="flex flex-col h-full bg-sidebar">
       {/* Logo */}
-      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-sidebar-border shrink-0">
+      <div className="h-12 flex items-center gap-2.5 px-4 border-b border-sidebar-border shrink-0">
         {/* Icon mark */}
         <div className="size-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
           <FileText className="size-3.5 text-sidebar-primary" />

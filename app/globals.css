@@ -53,83 +53,99 @@
 }
 
 :root {
-  /* Brand hue: deep indigo — Precise. Composed. Confident. */
-  --brand-hue: 265;
+  /* Warm neutral palette — inspired by Intercom's look & feel */
+  /* Neutrals use a very slight warm (earthy) hue, indigo only for interactive accents */
+  --warm: 80; /* warm hue anchor */
+  --accent-hue: 265; /* indigo — used only for interactive/brand accents */
 
-  --background: oklch(0.985 0.001 265);
-  --foreground: oklch(0.09 0.015 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.09 0.015 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.09 0.015 265);
-  --primary: oklch(0.44 0.22 265);
-  --primary-foreground: oklch(0.97 0.008 265);
-  --secondary: oklch(0.965 0.005 265);
-  --secondary-foreground: oklch(0.26 0.06 265);
-  --muted: oklch(0.965 0.005 265);
-  --muted-foreground: oklch(0.52 0.010 265);
-  --accent: oklch(0.95 0.008 265);
-  --accent-foreground: oklch(0.30 0.08 265);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.90 0.006 265);
-  --input: oklch(0.90 0.006 265);
-  --ring: oklch(0.55 0.15 265);
-  --overlay: oklch(0.12 0.025 265 / 25%);
-  --chart-1: oklch(0.44 0.22 265);
-  --chart-2: oklch(0.58 0.18 265);
-  --chart-3: oklch(0.70 0.12 265);
-  --chart-4: oklch(0.80 0.07 265);
-  --chart-5: oklch(0.90 0.03 265);
-  --radius: 0.625rem;
-  /* Sidebar: always dark charcoal regardless of color scheme */
-  --sidebar: oklch(0.18 0.025 265);
-  --sidebar-foreground: oklch(0.88 0.010 265);
-  --sidebar-primary: oklch(0.70 0.18 265);
-  --sidebar-primary-foreground: oklch(0.12 0.025 265);
-  --sidebar-accent: oklch(0.24 0.030 265);
-  --sidebar-accent-foreground: oklch(0.88 0.010 265);
-  --sidebar-border: oklch(0.28 0.020 265);
-  --sidebar-ring: oklch(0.60 0.15 265);
-  --sidebar-muted-foreground: oklch(0.55 0.012 265);
-  /* Shadows — hairline + ambient lift */
-  --shadow-sm: 0 0 0 1px oklch(0.88 0.008 265), 0 1px 3px oklch(0.14 0.022 265 / 5%), 0 4px 8px oklch(0.14 0.022 265 / 4%);
-  --shadow-md: 0 0 0 1px oklch(0.88 0.008 265), 0 2px 6px oklch(0.14 0.022 265 / 7%), 0 8px 16px oklch(0.14 0.022 265 / 6%);
-  --shadow-lg: 0 0 0 1px oklch(0.88 0.008 265), 0 4px 12px oklch(0.14 0.022 265 / 10%), 0 16px 32px oklch(0.14 0.022 265 / 8%);
+  /* Surfaces */
+  --background:        oklch(0.968 0.004 80);   /* warm off-white, slight cream */
+  --foreground:        oklch(0.10 0.008 80);    /* near-black warm */
+  --card:              oklch(1 0 0);            /* pure white */
+  --card-foreground:   oklch(0.10 0.008 80);
+  --popover:           oklch(1 0 0);
+  --popover-foreground: oklch(0.10 0.008 80);
+
+  /* Brand accent — indigo, used sparingly */
+  --primary:           oklch(0.42 0.20 265);
+  --primary-foreground: oklch(0.98 0.004 265);
+
+  /* Neutral surfaces */
+  --secondary:         oklch(0.955 0.004 80);
+  --secondary-foreground: oklch(0.25 0.008 80);
+  --muted:             oklch(0.950 0.004 80);
+  --muted-foreground:  oklch(0.50 0.010 80);   /* warm gray, not blue-gray */
+  --accent:            oklch(0.945 0.004 80);
+  --accent-foreground: oklch(0.20 0.008 80);
+
+  /* Semantic */
+  --destructive:       oklch(0.577 0.245 27.325);
+  --border:            oklch(0.885 0.006 80);   /* warm hairline */
+  --input:             oklch(0.885 0.006 80);
+  --ring:              oklch(0.52 0.18 265);
+  --overlay:           oklch(0.10 0.008 80 / 30%);
+
+  /* Charts */
+  --chart-1: oklch(0.42 0.20 265);
+  --chart-2: oklch(0.55 0.16 265);
+  --chart-3: oklch(0.68 0.11 265);
+  --chart-4: oklch(0.78 0.07 265);
+  --chart-5: oklch(0.88 0.03 265);
+
+  --radius: 0.5rem;
+
+  /* Sidebar — near-black, no color tint (Intercom-style dark sidebar) */
+  --sidebar:                    oklch(0.14 0.006 80);   /* near-black warm */
+  --sidebar-foreground:         oklch(0.82 0.006 80);   /* light warm gray */
+  --sidebar-primary:            oklch(0.75 0.14 265);   /* indigo accent */
+  --sidebar-primary-foreground: oklch(0.10 0.006 80);
+  --sidebar-accent:             oklch(0.20 0.006 80);   /* hover fill */
+  --sidebar-accent-foreground:  oklch(0.90 0.004 80);
+  --sidebar-border:             oklch(0.22 0.006 80);   /* very subtle separator */
+  --sidebar-ring:               oklch(0.52 0.18 265);
+  --sidebar-muted-foreground:   oklch(0.50 0.006 80);   /* locked items */
+
+  /* Shadows — hairline border + soft ambient (Intercom cards feel) */
+  --shadow-sm: 0 0 0 1px oklch(0.87 0.005 80), 0 1px 2px oklch(0.10 0.008 80 / 4%), 0 3px 6px oklch(0.10 0.008 80 / 3%);
+  --shadow-md: 0 0 0 1px oklch(0.87 0.005 80), 0 2px 5px oklch(0.10 0.008 80 / 6%), 0 8px 16px oklch(0.10 0.008 80 / 5%);
+  --shadow-lg: 0 0 0 1px oklch(0.87 0.005 80), 0 4px 10px oklch(0.10 0.008 80 / 8%), 0 16px 32px oklch(0.10 0.008 80 / 7%);
 }
 
 .dark {
-  --background: oklch(0.12 0.025 265);
-  --foreground: oklch(0.96 0.008 265);
-  --card: oklch(0.17 0.028 265);
-  --card-foreground: oklch(0.96 0.008 265);
-  --popover: oklch(0.17 0.028 265);
-  --popover-foreground: oklch(0.96 0.008 265);
-  --primary: oklch(0.70 0.18 265);
-  --primary-foreground: oklch(0.12 0.025 265);
-  --secondary: oklch(0.24 0.032 265);
-  --secondary-foreground: oklch(0.92 0.008 265);
-  --muted: oklch(0.22 0.026 265);
-  --muted-foreground: oklch(0.60 0.016 265);
-  --accent: oklch(0.22 0.026 265);
-  --accent-foreground: oklch(0.92 0.008 265);
-  --destructive: oklch(0.65 0.22 27.325);
-  --border: oklch(0.96 0.012 265 / 12%);
-  --input: oklch(0.96 0.010 265 / 18%);
-  --ring: oklch(0.60 0.15 265);
-  --overlay: oklch(0.08 0.03 265 / 60%);
-  --chart-1: oklch(0.70 0.18 265);
-  --chart-2: oklch(0.60 0.14 265);
-  --chart-3: oklch(0.50 0.10 265);
-  --chart-4: oklch(0.40 0.07 265);
-  --chart-5: oklch(0.30 0.04 265);
-  --sidebar: oklch(0.18 0.025 265);
-  --sidebar-foreground: oklch(0.88 0.010 265);
-  --sidebar-primary: oklch(0.70 0.18 265);
-  --sidebar-primary-foreground: oklch(0.12 0.025 265);
-  --sidebar-accent: oklch(0.24 0.030 265);
-  --sidebar-accent-foreground: oklch(0.88 0.010 265);
-  --sidebar-border: oklch(0.28 0.020 265);
-  --sidebar-ring: oklch(0.60 0.15 265);
+  --background:        oklch(0.13 0.006 80);
+  --foreground:        oklch(0.94 0.004 80);
+  --card:              oklch(0.18 0.006 80);
+  --card-foreground:   oklch(0.94 0.004 80);
+  --popover:           oklch(0.18 0.006 80);
+  --popover-foreground: oklch(0.94 0.004 80);
+  --primary:           oklch(0.68 0.18 265);
+  --primary-foreground: oklch(0.12 0.006 80);
+  --secondary:         oklch(0.22 0.006 80);
+  --secondary-foreground: oklch(0.90 0.004 80);
+  --muted:             oklch(0.20 0.006 80);
+  --muted-foreground:  oklch(0.58 0.008 80);
+  --accent:            oklch(0.22 0.006 80);
+  --accent-foreground: oklch(0.90 0.004 80);
+  --destructive:       oklch(0.65 0.22 27.325);
+  --border:            oklch(0.94 0.004 80 / 12%);
+  --input:             oklch(0.94 0.004 80 / 16%);
+  --ring:              oklch(0.58 0.18 265);
+  --overlay:           oklch(0.06 0.004 80 / 65%);
+  --chart-1: oklch(0.68 0.18 265);
+  --chart-2: oklch(0.58 0.14 265);
+  --chart-3: oklch(0.48 0.10 265);
+  --chart-4: oklch(0.38 0.07 265);
+  --chart-5: oklch(0.28 0.04 265);
+  /* Sidebar stays near-black in dark mode too */
+  --sidebar:                    oklch(0.11 0.005 80);
+  --sidebar-foreground:         oklch(0.80 0.005 80);
+  --sidebar-primary:            oklch(0.72 0.16 265);
+  --sidebar-primary-foreground: oklch(0.10 0.005 80);
+  --sidebar-accent:             oklch(0.18 0.005 80);
+  --sidebar-accent-foreground:  oklch(0.88 0.004 80);
+  --sidebar-border:             oklch(0.20 0.005 80);
+  --sidebar-ring:               oklch(0.58 0.18 265);
+  --sidebar-muted-foreground:   oklch(0.46 0.005 80);
 }
 
 @layer base {
@@ -149,11 +165,9 @@
 }
 
 @layer utilities {
-  /* Type scale */
-  .text-2xs  { font-size: 10px; line-height: 1.4; }
-  .text-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+  .text-2xs   { font-size: 10px; line-height: 1.4; }
+  .text-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
   .text-body  { font-size: 13px; line-height: 1.5; }
   .text-kpi   { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  /* Helvetica renders better with very slight tracking on headings */
-  h1, h2, h3 { letter-spacing: -0.015em; }
+  h1, h2, h3  { letter-spacing: -0.015em; }
 }
