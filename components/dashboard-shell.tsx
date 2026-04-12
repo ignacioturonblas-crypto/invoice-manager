@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Sidebar } from "@/components/sidebar"
@@ -13,7 +13,18 @@ interface DashboardShellProps {
 
 export function DashboardShell({ userEmail, children }: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [invoiceCount, setInvoiceCount] = useState<number | undefined>(undefined)
   const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from("invoices")
+      .select("id", { count: "exact", head: true })
+      .then(({ count }) => {
+        if (count !== null) setInvoiceCount(count)
+      })
+  }, [])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -28,6 +39,7 @@ export function DashboardShell({ userEmail, children }: DashboardShellProps) {
         onLogout={handleLogout}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        invoiceCount={invoiceCount}
       />
       <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
         <TopBar onMenuClick={() => setDrawerOpen(true)} />

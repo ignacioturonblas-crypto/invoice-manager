@@ -233,80 +233,116 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-          {/* Select all header */}
-          <div className="px-4 py-3 border-b border-border flex items-center gap-3">
-            <Checkbox
-              checked={selected.size === invoices.length && invoices.length > 0}
-              onCheckedChange={toggleSelectAll}
-              aria-label="Select all"
-            />
-            <span className="text-xs text-muted-foreground">{invoices.length} invoice{invoices.length !== 1 ? "s" : ""}</span>
+          {/* Table header */}
+          <div className="px-5 h-9 border-b border-border flex items-center gap-4 bg-muted/40">
+            <div className="w-5 shrink-0">
+              <Checkbox
+                checked={selected.size === invoices.length && invoices.length > 0}
+                onCheckedChange={toggleSelectAll}
+                aria-label="Select all"
+              />
+            </div>
+            <span className="text-label text-muted-foreground flex-1">Vendor</span>
+            <span className="text-label text-muted-foreground w-24 hidden sm:block">Date</span>
+            <span className="text-label text-muted-foreground w-20 hidden md:block">Quarter</span>
+            <span className="text-label text-muted-foreground w-16 hidden md:block">Type</span>
+            <span className="text-label text-muted-foreground w-28 text-right">Amount</span>
+            <div className="w-7 shrink-0" />
           </div>
 
           {invoices.map((invoice, i) => (
-            <div key={invoice.id} className={i < invoices.length - 1 ? "border-b border-border" : ""}>
-              <div className="px-4 py-4 flex items-center gap-3 hover:bg-accent/50 transition-colors group">
+            <div
+              key={invoice.id}
+              className={[
+                "group px-5 flex items-center gap-4 h-[52px] hover:bg-accent/40 transition-colors duration-150",
+                i < invoices.length - 1 ? "border-b border-border/60" : "",
+              ].join(" ")}
+            >
+              {/* Checkbox — visible on hover or when checked */}
+              <div className="w-5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                style={{ opacity: selected.has(invoice.id) ? 1 : undefined }}
+              >
                 <Checkbox
                   checked={selected.has(invoice.id)}
                   onCheckedChange={() => toggleSelect(invoice.id)}
                   onClick={(e) => e.stopPropagation()}
                   aria-label={`Select ${invoice.vendor ?? invoice.file_name}`}
                 />
-                <Link
-                  href={`/invoice/${invoice.id}`}
-                  className="flex-1 flex items-center gap-3 min-w-0"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold truncate">
-                        {invoice.vendor ?? invoice.file_name}
-                      </span>
-                      {invoice.status === "processing" && (
-                        <Badge variant="secondary" className="text-xs shrink-0">
-                          <Loader2 className="h-2.5 w-2.5 animate-spin mr-1" />
-                          Processing
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      {invoice.date && (
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(invoice.date).toLocaleDateString("es-ES")}
-                        </span>
-                      )}
-                      {invoice.quarter && invoice.year && (
-                        <Badge variant="outline" className="text-xs px-1.5 py-0">
-                          {invoice.quarter} {invoice.year}
-                        </Badge>
-                      )}
-                      <Badge
-                        variant="secondary"
-                        className={`text-xs px-1.5 py-0 ${
-                          invoice.type === "income"
-                            ? "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-400"
-                            : "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-400"
-                        }`}
-                      >
-                        {invoice.type}
-                      </Badge>
-                    </div>
-                  </div>
-                  {invoice.amount != null && (
-                    <span className="text-[15px] font-bold tabular-nums shrink-0">
-                      {fmt(invoice.amount)}
+              </div>
+
+              {/* Vendor + status */}
+              <Link
+                href={`/invoice/${invoice.id}`}
+                className="flex-1 flex items-center gap-3 min-w-0 h-full"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-medium text-foreground truncate leading-none">
+                      {invoice.vendor ?? invoice.file_name}
                     </span>
-                  )}
-                </Link>
+                    {invoice.status === "processing" && (
+                      <Badge variant="secondary" className="text-[10px] h-4 px-1.5 shrink-0 gap-1">
+                        <Loader2 className="h-2 w-2 animate-spin" />
+                        Processing
+                      </Badge>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-muted-foreground sm:hidden mt-0.5 block">
+                    {invoice.date ? new Date(invoice.date).toLocaleDateString("es-ES") : "—"}
+                    {invoice.quarter && invoice.year ? ` · ${invoice.quarter} ${invoice.year}` : ""}
+                  </span>
+                </div>
+              </Link>
+
+              {/* Date */}
+              <span className="text-[12px] text-muted-foreground w-24 hidden sm:block shrink-0">
+                {invoice.date ? new Date(invoice.date).toLocaleDateString("es-ES") : "—"}
+              </span>
+
+              {/* Quarter */}
+              <div className="w-20 hidden md:flex shrink-0">
+                {invoice.quarter && invoice.year ? (
+                  <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                    {invoice.quarter} {invoice.year}
+                  </span>
+                ) : (
+                  <span className="text-[11px] text-muted-foreground/50">—</span>
+                )}
+              </div>
+
+              {/* Type */}
+              <div className="w-16 hidden md:flex shrink-0">
+                <span className={[
+                  "text-[11px] font-medium px-2 py-0.5 rounded capitalize",
+                  invoice.type === "income"
+                    ? "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400"
+                    : "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+                ].join(" ")}>
+                  {invoice.type}
+                </span>
+              </div>
+
+              {/* Amount */}
+              <span className={[
+                "text-[13px] font-semibold tabular-nums w-28 text-right shrink-0",
+                invoice.type === "income" ? "text-green-700 dark:text-green-400" : "text-foreground",
+              ].join(" ")}>
+                {invoice.amount != null ? fmt(invoice.amount) : "—"}
+              </span>
+
+              {/* Delete — hover only */}
+              <div className="w-7 shrink-0 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                 <button
-                  className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/8 transition-colors"
+                  className="p-1 rounded text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
+                    e.preventDefault();
                     setSelected(new Set([invoice.id]));
                     setDeleteDialogOpen(true);
                   }}
                   title="Delete"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>

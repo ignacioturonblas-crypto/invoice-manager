@@ -10,6 +10,7 @@ interface SidebarProps {
   onLogout: () => void
   open: boolean
   onClose: () => void
+  invoiceCount?: number
 }
 
 const NAV_ITEMS = [
@@ -19,7 +20,11 @@ const NAV_ITEMS = [
   { id: "projects", label: "Project Management", href: "/projects", icon: Briefcase, locked: true },
 ]
 
-function SidebarBody({ userEmail, onLogout }: Pick<SidebarProps, "userEmail" | "onLogout">) {
+function SidebarBody({
+  userEmail,
+  onLogout,
+  invoiceCount,
+}: Pick<SidebarProps, "userEmail" | "onLogout" | "invoiceCount">) {
   const pathname = usePathname()
   const isInvoicesActive =
     pathname.startsWith("/dashboard") ||
@@ -29,14 +34,18 @@ function SidebarBody({ userEmail, onLogout }: Pick<SidebarProps, "userEmail" | "
   return (
     <div className="flex flex-col h-full bg-sidebar">
       {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-sidebar-border shrink-0">
-        <span className="text-sm font-semibold text-sidebar-foreground tracking-tight">
+      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-sidebar-border shrink-0">
+        {/* Icon mark */}
+        <div className="size-6 rounded-md bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+          <FileText className="size-3.5 text-sidebar-primary" />
+        </div>
+        <span className="text-[13px] font-semibold text-sidebar-foreground tracking-tight">
           Invoice Manager
         </span>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-2 py-3 space-y-px overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
           const isActive = item.id === "invoices" ? isInvoicesActive : pathname === item.href
@@ -45,11 +54,11 @@ function SidebarBody({ userEmail, onLogout }: Pick<SidebarProps, "userEmail" | "
             return (
               <div
                 key={item.id}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] opacity-40 cursor-default select-none"
+                className="flex items-center gap-2.5 px-3 h-9 rounded-md text-[13px] opacity-35 cursor-default select-none"
               >
-                <Icon className="size-4 shrink-0 text-sidebar-foreground" />
+                <Icon className="size-3.5 shrink-0 text-sidebar-foreground" />
                 <span className="flex-1 text-sidebar-foreground truncate">{item.label}</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sidebar-border text-sidebar-muted-foreground font-medium">
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-sidebar-border/60 text-sidebar-muted-foreground font-medium tracking-wide uppercase">
                   Soon
                 </span>
               </div>
@@ -61,36 +70,46 @@ function SidebarBody({ userEmail, onLogout }: Pick<SidebarProps, "userEmail" | "
               key={item.id}
               href={item.href}
               className={[
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors",
+                "relative flex items-center gap-2.5 px-3 h-9 rounded-md text-[13px] transition-colors duration-150",
                 isActive
-                  ? "border-l-2 border-sidebar-primary bg-sidebar-accent text-sidebar-primary font-medium pl-[10px]"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  ? "bg-sidebar-accent text-sidebar-primary font-medium"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
               ].join(" ")}
             >
-              <Icon className="size-4 shrink-0" />
-              <span className="truncate">{item.label}</span>
+              {/* Active indicator — 3px left pill */}
+              {isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-sidebar-primary" />
+              )}
+              <Icon className="size-3.5 shrink-0" />
+              <span className="flex-1 truncate">{item.label}</span>
+              {/* Invoice count badge on active item */}
+              {isActive && invoiceCount !== undefined && invoiceCount > 0 && (
+                <span className="text-[10px] font-semibold tabular-nums px-1.5 min-w-[20px] text-center py-0.5 rounded-full bg-sidebar-primary/15 text-sidebar-primary">
+                  {invoiceCount > 99 ? "99+" : invoiceCount}
+                </span>
+              )}
             </Link>
           )
         })}
       </nav>
 
       {/* User */}
-      <div className="px-3 py-4 border-t border-sidebar-border shrink-0">
-        <div className="flex items-center gap-2 px-2">
-          <div className="size-7 rounded-full bg-sidebar-accent flex items-center justify-center shrink-0">
-            <span className="text-[11px] font-semibold text-sidebar-primary">
+      <div className="px-3 py-3 shrink-0">
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-sidebar-accent/60 transition-colors group">
+          <div className="size-6 rounded-full bg-sidebar-primary/20 flex items-center justify-center shrink-0">
+            <span className="text-[10px] font-bold text-sidebar-primary">
               {userEmail?.[0]?.toUpperCase() ?? "?"}
             </span>
           </div>
-          <span className="text-xs text-sidebar-muted-foreground truncate flex-1">
+          <span className="text-[12px] text-sidebar-muted-foreground truncate flex-1 leading-none">
             {userEmail ?? ""}
           </span>
           <button
             onClick={onLogout}
-            className="text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors shrink-0"
+            className="text-sidebar-muted-foreground/50 hover:text-sidebar-foreground transition-colors shrink-0 opacity-0 group-hover:opacity-100"
             aria-label="Sign out"
           >
-            <LogOut className="size-4" />
+            <LogOut className="size-3.5" />
           </button>
         </div>
       </div>
@@ -98,18 +117,18 @@ function SidebarBody({ userEmail, onLogout }: Pick<SidebarProps, "userEmail" | "
   )
 }
 
-export function Sidebar({ userEmail, onLogout, open, onClose }: SidebarProps) {
+export function Sidebar({ userEmail, onLogout, open, onClose, invoiceCount }: SidebarProps) {
   return (
     <>
       {/* Desktop: permanent sidebar */}
-      <aside className="hidden lg:flex w-64 h-screen flex-col shrink-0 border-r border-sidebar-border">
-        <SidebarBody userEmail={userEmail} onLogout={onLogout} />
+      <aside className="hidden lg:flex w-60 h-screen flex-col shrink-0 border-r border-sidebar-border">
+        <SidebarBody userEmail={userEmail} onLogout={onLogout} invoiceCount={invoiceCount} />
       </aside>
 
       {/* Mobile: slide-over drawer */}
       <div className="lg:hidden">
         <Sheet open={open} onClose={onClose}>
-          <SidebarBody userEmail={userEmail} onLogout={onLogout} />
+          <SidebarBody userEmail={userEmail} onLogout={onLogout} invoiceCount={invoiceCount} />
         </Sheet>
       </div>
     </>

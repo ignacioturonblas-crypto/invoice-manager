@@ -12,19 +12,20 @@ export function KpiCard({ label, value, icon, iconBg, className }: KpiCardProps)
   return (
     <div
       className={cn(
-        "bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow px-5 py-4 flex items-center gap-4",
+        "bg-card rounded-xl shadow-sm px-5 py-5 flex flex-col gap-3 relative overflow-hidden",
         className
       )}
     >
-      <div className={cn("p-2 rounded-lg shrink-0 transition-colors", iconBg)}>
+      {/* Icon — top right */}
+      <div className={cn("absolute top-4 right-4 p-2 rounded-lg", iconBg)}>
         {icon}
       </div>
-      <div className="min-w-0">
-        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground truncate">
-          {label}
-        </p>
-        <p className="text-base font-bold tabular-nums truncate">{value}</p>
-      </div>
+
+      {/* Label */}
+      <p className="text-label text-muted-foreground pr-10">{label}</p>
+
+      {/* Value */}
+      <p className="text-kpi text-foreground leading-none">{value}</p>
     </div>
   )
 }

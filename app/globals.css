@@ -56,23 +56,23 @@
   /* Brand hue: deep indigo — Precise. Composed. Confident. */
   --brand-hue: 265;
 
-  --background: oklch(0.99 0.004 265);
-  --foreground: oklch(0.14 0.022 265);
+  --background: oklch(0.985 0.001 265);
+  --foreground: oklch(0.09 0.015 265);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.14 0.022 265);
-  --popover: oklch(1 0.002 265);
-  --popover-foreground: oklch(0.14 0.022 265);
+  --card-foreground: oklch(0.09 0.015 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.09 0.015 265);
   --primary: oklch(0.44 0.22 265);
   --primary-foreground: oklch(0.97 0.008 265);
-  --secondary: oklch(0.965 0.008 265);
+  --secondary: oklch(0.965 0.005 265);
   --secondary-foreground: oklch(0.26 0.06 265);
-  --muted: oklch(0.965 0.008 265);
-  --muted-foreground: oklch(0.50 0.016 265);
-  --accent: oklch(0.94 0.014 265);
+  --muted: oklch(0.965 0.005 265);
+  --muted-foreground: oklch(0.52 0.010 265);
+  --accent: oklch(0.95 0.008 265);
   --accent-foreground: oklch(0.30 0.08 265);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0.012 265);
-  --input: oklch(0.88 0.012 265);
+  --border: oklch(0.90 0.006 265);
+  --input: oklch(0.90 0.006 265);
   --ring: oklch(0.55 0.15 265);
   --overlay: oklch(0.12 0.025 265 / 25%);
   --chart-1: oklch(0.44 0.22 265);
@@ -91,10 +91,10 @@
   --sidebar-border: oklch(0.28 0.020 265);
   --sidebar-ring: oklch(0.60 0.15 265);
   --sidebar-muted-foreground: oklch(0.55 0.012 265);
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 oklch(0.14 0.022 265 / 6%);
-  --shadow-md: 0 4px 8px -2px oklch(0.14 0.022 265 / 10%), 0 2px 4px -1px oklch(0.14 0.022 265 / 6%);
-  --shadow-lg: 0 10px 20px -4px oklch(0.14 0.022 265 / 12%), 0 4px 8px -2px oklch(0.14 0.022 265 / 8%);
+  /* Shadows — hairline + ambient lift */
+  --shadow-sm: 0 0 0 1px oklch(0.88 0.008 265), 0 1px 3px oklch(0.14 0.022 265 / 5%), 0 4px 8px oklch(0.14 0.022 265 / 4%);
+  --shadow-md: 0 0 0 1px oklch(0.88 0.008 265), 0 2px 6px oklch(0.14 0.022 265 / 7%), 0 8px 16px oklch(0.14 0.022 265 / 6%);
+  --shadow-lg: 0 0 0 1px oklch(0.88 0.008 265), 0 4px 12px oklch(0.14 0.022 265 / 10%), 0 16px 32px oklch(0.14 0.022 265 / 8%);
 }
 
 .dark {
@@ -138,8 +138,22 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
   }
+}
+
+@layer utilities {
+  /* Type scale */
+  .text-2xs  { font-size: 10px; line-height: 1.4; }
+  .text-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+  .text-body  { font-size: 13px; line-height: 1.5; }
+  .text-kpi   { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  /* Helvetica renders better with very slight tracking on headings */
+  h1, h2, h3 { letter-spacing: -0.015em; }
 }
