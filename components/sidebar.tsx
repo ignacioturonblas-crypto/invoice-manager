@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FileText, CreditCard, Package, Briefcase, LogOut } from "lucide-react"
+import { FileText, CreditCard, Package, Briefcase, LogOut, Building2 } from "lucide-react"
 import { Sheet } from "@/components/ui/sheet"
 import { MassioLogo } from "@/components/massio-logo"
 
@@ -16,6 +16,7 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { id: "invoices", label: "Invoices", href: "/dashboard", icon: FileText, locked: false },
+  { id: "suppliers", label: "Suppliers", href: "/suppliers", icon: Building2, locked: false },
   { id: "billing", label: "Billing", href: "/billing", icon: CreditCard, locked: true },
   { id: "orders", label: "Orders", href: "/orders", icon: Package, locked: true },
   { id: "projects", label: "Project Management", href: "/projects", icon: Briefcase, locked: true },
@@ -31,6 +32,7 @@ function SidebarBody({
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/invoice") ||
     pathname === "/upload"
+  const isSuppliersActive = pathname.startsWith("/suppliers")
 
   return (
     <div className="flex flex-col h-full bg-sidebar">
@@ -43,7 +45,7 @@ function SidebarBody({
       <nav className="flex-1 px-2 py-3 space-y-px overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
-          const isActive = item.id === "invoices" ? isInvoicesActive : pathname === item.href
+          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : pathname === item.href
 
           if (item.locked) {
             return (

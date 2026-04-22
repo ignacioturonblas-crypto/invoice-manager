@@ -37,6 +37,37 @@ export interface ExtractedInvoiceData {
   raw: Record<string, unknown>;
 }
 
+export interface Supplier {
+  id: string;
+  created_by: string | null;
+  business_name: string;
+  vat_number: string | null;
+  address: string | null;
+  shipping_address: string | null;
+  zip_code: string | null;
+  country: string | null;
+  contact_person: string | null;
+  phone: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MyCompany {
+  id: string;
+  user_id: string;
+  business_name: string | null;
+  vat_number: string | null;
+  billing_address: string | null;
+  shipping_address: string | null;
+  zip_code: string | null;
+  country: string | null;
+  contact_person: string | null;
+  phone: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export function getQuarterFromDate(dateStr: string): { quarter: Quarter; year: number } | null {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return null;

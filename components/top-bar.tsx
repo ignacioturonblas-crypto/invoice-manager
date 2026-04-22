@@ -12,6 +12,7 @@ interface TopBarProps {
 const TITLES: Record<string, string> = {
   "/dashboard": "Invoices",
   "/upload": "Upload Invoice",
+  "/suppliers": "Suppliers",
   "/billing": "Billing",
   "/orders": "Orders",
   "/projects": "Project Management",
