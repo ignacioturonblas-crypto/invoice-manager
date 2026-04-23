@@ -46,6 +46,7 @@ function formatCompanyForCopy(c: MyCompany): string {
   if (c.country)          lines.push(`Country: ${c.country}`)
   if (c.contact_person)   lines.push(`Contact Person: ${c.contact_person}`)
   if (c.phone)            lines.push(`Phone: ${c.phone}`)
+  if (c.email)            lines.push(`Email: ${c.email}`)
   return lines.join("\n")
 }
 
@@ -76,6 +77,7 @@ type CompanyFormData = {
   country: string
   contact_person: string
   phone: string
+  email: string
 }
 
 const BLANK_SUPPLIER: SupplierFormData = {
@@ -99,6 +101,7 @@ const BLANK_COMPANY: CompanyFormData = {
   country: "",
   contact_person: "",
   phone: "",
+  email: "",
 }
 
 // ─── field helper ─────────────────────────────────────────────────────────────
@@ -159,6 +162,7 @@ function MyCompanyPanel() {
         country: data.country ?? "",
         contact_person: data.contact_person ?? "",
         phone: data.phone ?? "",
+        email: data.email ?? "",
       })
     }
     setLoading(false)
@@ -181,6 +185,7 @@ function MyCompanyPanel() {
       country: form.country || null,
       contact_person: form.contact_person || null,
       phone: form.phone || null,
+      email: form.email || null,
     }
 
     const { error } = company
@@ -264,6 +269,9 @@ function MyCompanyPanel() {
             {company?.phone && (
               <span className="text-muted-foreground">Phone: <span className="text-foreground">{company.phone}</span></span>
             )}
+            {company?.email && (
+              <span className="text-muted-foreground">Email: <span className="text-foreground">{company.email}</span></span>
+            )}
           </div>
         </CardContent>
       )}
@@ -286,6 +294,7 @@ function MyCompanyPanel() {
             <Field label="Country" {...f("country")} />
             <Field label="Person of Contact" {...f("contact_person")} />
             <Field label="Phone Number" {...f("phone")} />
+            <Field label="Email" {...f("email")} />
           </div>
           <div className="flex justify-end mt-4">
             <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={save} disabled={saving}>

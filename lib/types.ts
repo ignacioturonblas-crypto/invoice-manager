@@ -64,6 +64,7 @@ export interface MyCompany {
   country: string | null;
   contact_person: string | null;
   phone: string | null;
+  email: string | null;
   created_at: string;
   updated_at: string;
 }
