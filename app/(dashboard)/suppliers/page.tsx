@@ -410,7 +410,7 @@ function SnippetsPanel() {
               <CardContent className="px-4 py-3 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-[13px] font-semibold leading-snug">{s.title}</p>
-                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 sm:transition-opacity">
                     <Button variant="ghost" size="icon" className="size-6" onClick={() => openEdit(s)} title="Edit">
                       <Pencil className="size-3" />
                     </Button>
