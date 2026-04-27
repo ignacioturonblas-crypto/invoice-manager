@@ -19,7 +19,7 @@ import {
   Plus, Search, Copy, Pencil, Trash2, ChevronDown, ChevronUp,
   Building2, X, Check, Loader2
 } from "lucide-react"
-import type { Supplier, MyCompany } from "@/lib/types"
+import type { Supplier, MyCompany, Snippet } from "@/lib/types"
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -301,6 +301,203 @@ function MyCompanyPanel() {
   )
 }
 
+// ─── Snippets Panel ───────────────────────────────────────────────────────────
+
+function SnippetsPanel() {
+  const supabase = createClient()
+  const [snippets, setSnippets] = useState<Snippet[]>([])
+  const [loading, setLoading] = useState(true)
+  const [addOpen, setAddOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<Snippet | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Snippet | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const [form, setForm] = useState({ title: "", content: "" })
+
+  const fetchSnippets = useCallback(async () => {
+    setLoading(true)
+    const { data } = await supabase.from("snippets").select("*").order("created_at", { ascending: true })
+    setSnippets(data ?? [])
+    setLoading(false)
+  }, [supabase])
+
+  useEffect(() => { fetchSnippets() }, [fetchSnippets])
+
+  function openAdd() {
+    setForm({ title: "", content: "" })
+    setAddOpen(true)
+  }
+
+  function openEdit(s: Snippet) {
+    setForm({ title: s.title, content: s.content })
+    setEditTarget(s)
+  }
+
+  async function handleSave() {
+    if (!form.title.trim() || !form.content.trim()) {
+      toast.error("Title and content are required")
+      return
+    }
+    setSaving(true)
+    const { error } = editTarget
+      ? await supabase.from("snippets").update({ title: form.title, content: form.content }).eq("id", editTarget.id)
+      : await supabase.from("snippets").insert({ title: form.title, content: form.content })
+    if (error) {
+      toast.error("Failed to save snippet")
+    } else {
+      toast.success(editTarget ? "Snippet updated" : "Snippet added")
+      setAddOpen(false)
+      setEditTarget(null)
+      await fetchSnippets()
+    }
+    setSaving(false)
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
+    const { error } = await supabase.from("snippets").delete().eq("id", deleteTarget.id)
+    if (error) {
+      toast.error("Failed to delete snippet")
+    } else {
+      toast.success("Snippet deleted")
+      setDeleteTarget(null)
+      await fetchSnippets()
+    }
+    setDeleting(false)
+  }
+
+  async function handleCopy(s: Snippet) {
+    await navigator.clipboard.writeText(s.content)
+    setCopiedId(s.id)
+    toast.success(`"${s.title}" copied`)
+    setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  const dialogOpen = addOpen || !!editTarget
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-[14px] font-semibold">Quick Copy</h2>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Reusable snippets — invoicing instructions, shipping notes, etc.</p>
+        </div>
+        <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={openAdd}>
+          <Plus className="size-3.5" />
+          Add snippet
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-8 text-muted-foreground">
+          <Loader2 className="size-4 animate-spin mr-2" />
+          <span className="text-sm">Loading…</span>
+        </div>
+      ) : snippets.length === 0 ? (
+        <Card className="border-border/60">
+          <CardContent className="flex flex-col items-center justify-center py-10 text-muted-foreground gap-2">
+            <Copy className="size-7 opacity-25" />
+            <p className="text-sm">No snippets yet — add your first one</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {snippets.map(s => (
+            <Card key={s.id} className="border-border/60 group">
+              <CardContent className="px-4 py-3 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-[13px] font-semibold leading-snug">{s.title}</p>
+                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="icon" className="size-6" onClick={() => openEdit(s)} title="Edit">
+                      <Pencil className="size-3" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="size-6 hover:text-destructive" onClick={() => setDeleteTarget(s)} title="Delete">
+                      <Trash2 className="size-3" />
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-4">{s.content}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 text-xs w-full mt-1"
+                  onClick={() => handleCopy(s)}
+                >
+                  {copiedId === s.id ? <Check className="size-3 text-green-500" /> : <Copy className="size-3" />}
+                  {copiedId === s.id ? "Copied!" : "Copy"}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit dialog */}
+      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) { setAddOpen(false); setEditTarget(null) } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editTarget ? "Edit snippet" : "Add snippet"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-1">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Title</Label>
+              <Input
+                value={form.title}
+                onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))}
+                placeholder="e.g. Invoicing instructions"
+                className="h-8 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Content</Label>
+              <textarea
+                value={form.content}
+                onChange={(e) => setForm(p => ({ ...p, content: e.target.value }))}
+                placeholder="Paste your invoicing instructions, shipping notes, etc."
+                rows={6}
+                className="w-full rounded-lg border border-input bg-card px-3 py-2 text-[13px] leading-relaxed transition-colors outline-none placeholder:text-muted-foreground/60 focus-visible:border-ring/60 focus-visible:ring-2 focus-visible:ring-ring/25 resize-y"
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-2">
+            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => { setAddOpen(false); setEditTarget(null) }}>
+              Cancel
+            </Button>
+            <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={handleSave} disabled={saving}>
+              {saving ? <Loader2 className="size-3 animate-spin" /> : <Check className="size-3" />}
+              {editTarget ? "Save changes" : "Add snippet"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete snippet?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">"{deleteTarget?.title}"</span>?
+              {" "}This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <Trash2 className="h-4 w-4 mr-1.5" />}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
 // ─── Supplier Form ────────────────────────────────────────────────────────────
 
 interface SupplierFormProps {
@@ -543,6 +740,9 @@ export default function SuppliersPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* My Company */}
       <MyCompanyPanel />
+
+      {/* Quick Copy snippets */}
+      <SnippetsPanel />
 
       {/* Suppliers list */}
       <div className="space-y-3">

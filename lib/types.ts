@@ -69,6 +69,14 @@ export interface MyCompany {
   updated_at: string;
 }
 
+export interface Snippet {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export function getQuarterFromDate(dateStr: string): { quarter: Quarter; year: number } | null {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return null;
