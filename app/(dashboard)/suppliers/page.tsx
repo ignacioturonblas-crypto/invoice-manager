@@ -144,12 +144,9 @@ function MyCompanyPanel() {
 
   const fetchCompany = useCallback(async () => {
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setLoading(false); return }
     const { data } = await supabase
       .from("my_company")
       .select("*")
-      .eq("user_id", user.id)
       .maybeSingle()
     setCompany(data ?? null)
     if (data) {
@@ -172,11 +169,7 @@ function MyCompanyPanel() {
 
   async function save() {
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setSaving(false); return }
-
     const payload = {
-      user_id: user.id,
       business_name: form.business_name || null,
       vat_number: form.vat_number || null,
       billing_address: form.billing_address || null,
