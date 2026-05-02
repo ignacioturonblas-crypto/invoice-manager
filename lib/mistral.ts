@@ -1,5 +1,5 @@
 import { Mistral } from "@mistralai/mistralai";
-import type { ExtractedInvoiceData } from "./types";
+import type { ExtractedBankStatementData, ExtractedInvoiceData } from "./types";
 
 const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY! });
 
@@ -89,4 +89,64 @@ export async function extractInvoiceData(
     return extractFromPdf(fileBase64);
   }
   return extractFromImage(fileBase64, mimeType);
+}
+
+const BANK_STATEMENT_PROMPT = `You are a bank statement parser. Extract ALL transactions from this bank statement.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "transactions": [
+    {
+      "date": "YYYY-MM-DD or null",
+      "description": "merchant or transaction description",
+      "amount": positive number without currency symbol,
+      "direction": "debit" or "credit"
+    }
+  ],
+  "raw": {}
+}
+
+Rules:
+- Include every transaction row, no omissions
+- Amounts are always positive numbers (e.g. 45.00, not -45.00)
+- direction is "debit" when money leaves the account, "credit" when money arrives
+- Dates must be YYYY-MM-DD
+- Skip opening/closing balance rows and header rows
+- If direction is ambiguous, default to "debit"
+- Put any metadata (account number, statement period, bank name) in the "raw" object`;
+
+function parseBankJson(text: string): ExtractedBankStatementData {
+  const json = text.trim().replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+  try {
+    return JSON.parse(json) as ExtractedBankStatementData;
+  } catch {
+    return { transactions: [], raw: { raw_text: text } };
+  }
+}
+
+export async function extractBankStatement(
+  fileBase64: string
+): Promise<ExtractedBankStatementData> {
+  // Step 1: OCR the PDF
+  const ocrResponse = await client.ocr.process({
+    model: "mistral-ocr-latest",
+    document: {
+      type: "document_url",
+      documentUrl: `data:application/pdf;base64,${fileBase64}`,
+    },
+  });
+
+  const ocrText = ocrResponse.pages?.map((p: { markdown: string }) => p.markdown).join("\n\n") ?? "";
+
+  // Step 2: Extract structured transaction list
+  const chatResponse = await client.chat.complete({
+    model: "mistral-small-latest",
+    messages: [{
+      role: "user",
+      content: `${BANK_STATEMENT_PROMPT}\n\nBank statement text:\n${ocrText}`,
+    }],
+  });
+
+  const text = chatResponse.choices?.[0]?.message?.content;
+  return parseBankJson(typeof text === "string" ? text : "");
 }

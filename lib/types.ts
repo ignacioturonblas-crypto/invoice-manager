@@ -77,6 +77,49 @@ export interface Snippet {
   updated_at: string;
 }
 
+export type BankStatementStatus = "processing" | "done" | "error";
+export type MatchStatus = "matched" | "unmatched" | "dismissed";
+export type TransactionDirection = "debit" | "credit";
+
+export interface BankStatement {
+  id: string;
+  file_path: string;
+  file_name: string;
+  quarter: Quarter | null;
+  year: number | null;
+  status: BankStatementStatus;
+  raw_text: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BankTransaction {
+  id: string;
+  statement_id: string;
+  date: string | null;
+  description: string | null;
+  amount: number | null;
+  direction: TransactionDirection | null;
+  match_status: MatchStatus;
+  matched_invoice_id: string | null;
+  manually_set: boolean;
+  created_at: string;
+  updated_at: string;
+  matched_invoice?: Pick<Invoice, "id" | "vendor" | "invoice_number" | "date" | "amount">;
+}
+
+export interface ExtractedTransaction {
+  date: string | null;
+  description: string | null;
+  amount: number | null;
+  direction: TransactionDirection | null;
+}
+
+export interface ExtractedBankStatementData {
+  transactions: ExtractedTransaction[];
+  raw: Record<string, unknown>;
+}
+
 export function getQuarterFromDate(dateStr: string): { quarter: Quarter; year: number } | null {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return null;
