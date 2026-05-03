@@ -17,9 +17,10 @@ import {
 import { toast } from "sonner"
 import {
   Plus, Search, Copy, Pencil, Trash2, ChevronDown, ChevronUp,
-  Building2, X, Check, Loader2
+  Building2, X, Check, Loader2, Package
 } from "lucide-react"
-import type { Supplier, MyCompany, Snippet } from "@/lib/types"
+import type { Supplier, MyCompany, Snippet, SupplierOrderStats } from "@/lib/types"
+import { useRouter } from "next/navigation"
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -576,11 +577,13 @@ function SupplierForm({ initial, onSave, onCancel, saving }: SupplierFormProps) 
 
 interface SupplierRowProps {
   supplier: Supplier
+  stats?: SupplierOrderStats
   onEdit: (s: Supplier) => void
   onDelete: (s: Supplier) => void
 }
 
-function SupplierRow({ supplier, onEdit, onDelete }: SupplierRowProps) {
+function SupplierRow({ supplier, stats, onEdit, onDelete }: SupplierRowProps) {
+  const router = useRouter()
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -590,6 +593,12 @@ function SupplierRow({ supplier, onEdit, onDelete }: SupplierRowProps) {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const activeCount = stats?.active_count ?? 0
+  const hasStats = (stats?.delivered_count ?? 0) > 0
+  const onTimePct = hasStats && stats!.delivered_count > 0
+    ? Math.round((stats!.on_time_count / stats!.delivered_count) * 100)
+    : null
+
   return (
     <div className="group flex items-center gap-3 px-4 py-3 border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors">
       <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -598,12 +607,39 @@ function SupplierRow({ supplier, onEdit, onDelete }: SupplierRowProps) {
         </span>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-medium truncate">{supplier.business_name}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-[13px] font-medium truncate">{supplier.business_name}</p>
+          {activeCount > 0 && (
+            <button
+              onClick={() => router.push(`/orders?supplier=${supplier.id}`)}
+              className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors tabular-nums"
+              title="View active orders"
+            >
+              {activeCount} active
+            </button>
+          )}
+        </div>
         <p className="text-[11px] text-muted-foreground truncate">
           {[supplier.vat_number, supplier.country, supplier.contact_person].filter(Boolean).join(" · ")}
         </p>
+        {hasStats && (
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+            Avg lead time: {stats!.avg_lead_days !== null ? `${Math.round(stats!.avg_lead_days)}d` : "—"}
+            {onTimePct !== null && ` · On time: ${onTimePct}%`}
+            {` · ${stats!.delivered_count} order${stats!.delivered_count !== 1 ? "s" : ""} delivered`}
+          </p>
+        )}
       </div>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7"
+          onClick={() => router.push(`/orders?supplier=${supplier.id}&add=1`)}
+          title="Add order for this supplier"
+        >
+          <Package className="size-3.5" />
+        </Button>
         <Button
           variant="ghost"
           size="icon"
@@ -643,6 +679,7 @@ export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [orderStats, setOrderStats] = useState<Map<string, SupplierOrderStats>>(new Map())
 
   const [addOpen, setAddOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Supplier | null>(null)
@@ -660,7 +697,43 @@ export default function SuppliersPage() {
     setLoading(false)
   }, [supabase])
 
-  useEffect(() => { fetchSuppliers() }, [fetchSuppliers])
+  const fetchOrderStats = useCallback(async () => {
+    const { data } = await supabase
+      .from("orders")
+      .select("supplier_id, status, order_date, actual_date, expected_date")
+    if (!data) return
+    const map = new Map<string, SupplierOrderStats>()
+    for (const row of data) {
+      const s = map.get(row.supplier_id) ?? {
+        supplier_id: row.supplier_id,
+        active_count: 0,
+        delivered_count: 0,
+        avg_lead_days: null,
+        on_time_count: 0,
+      }
+      const isActive = row.status !== "delivered" && row.status !== "cancelled"
+      if (isActive) s.active_count++
+      if (row.status === "delivered") {
+        s.delivered_count++
+        if (row.actual_date && row.order_date) {
+          const leadDays = (new Date(row.actual_date).getTime() - new Date(row.order_date).getTime()) / 86400000
+          s.avg_lead_days = s.avg_lead_days === null
+            ? leadDays
+            : (s.avg_lead_days * (s.delivered_count - 1) + leadDays) / s.delivered_count
+        }
+        if (row.actual_date && row.expected_date && row.actual_date <= row.expected_date) {
+          s.on_time_count++
+        }
+      }
+      map.set(row.supplier_id, s)
+    }
+    setOrderStats(map)
+  }, [supabase])
+
+  useEffect(() => {
+    fetchSuppliers()
+    fetchOrderStats()
+  }, [fetchSuppliers, fetchOrderStats])
 
   const filtered = suppliers.filter(s => {
     if (!search) return true
@@ -793,6 +866,7 @@ export default function SuppliersPage() {
                 <SupplierRow
                   key={s.id}
                   supplier={s}
+                  stats={orderStats.get(s.id)}
                   onEdit={(s) => setEditTarget(s)}
                   onDelete={(s) => setDeleteTarget(s)}
                 />
@@ -848,6 +922,11 @@ export default function SuppliersPage() {
               Are you sure you want to delete{" "}
               <span className="font-medium text-foreground">{deleteTarget?.business_name}</span>?
               {" "}This cannot be undone.
+              {deleteTarget && (orderStats.get(deleteTarget.id)?.active_count ?? 0) > 0 && (
+                <span className="block mt-2 text-amber-600 font-medium">
+                  ⚠ This supplier has {orderStats.get(deleteTarget.id)!.active_count} active order{orderStats.get(deleteTarget.id)!.active_count !== 1 ? "s" : ""} that will also be deleted.
+                </span>
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

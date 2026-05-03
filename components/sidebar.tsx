@@ -12,6 +12,7 @@ interface SidebarProps {
   open: boolean
   onClose: () => void
   invoiceCount?: number
+  activeOrderCount?: number
 }
 
 const NAV_ITEMS = [
@@ -19,7 +20,7 @@ const NAV_ITEMS = [
   { id: "suppliers", label: "Suppliers", href: "/suppliers", icon: Building2, locked: false },
   { id: "reconciliation", label: "Reconciliation", href: "/reconciliation", icon: GitMerge, locked: false },
   { id: "billing", label: "Billing", href: "/billing", icon: CreditCard, locked: true },
-  { id: "orders", label: "Orders", href: "/orders", icon: Package, locked: true },
+  { id: "orders", label: "Orders", href: "/orders", icon: Package, locked: false },
   { id: "projects", label: "Project Management", href: "/projects", icon: Briefcase, locked: true },
 ]
 
@@ -27,7 +28,8 @@ function SidebarBody({
   userEmail,
   onLogout,
   invoiceCount,
-}: Pick<SidebarProps, "userEmail" | "onLogout" | "invoiceCount">) {
+  activeOrderCount,
+}: Pick<SidebarProps, "userEmail" | "onLogout" | "invoiceCount" | "activeOrderCount">) {
   const pathname = usePathname()
   const isInvoicesActive =
     pathname.startsWith("/dashboard") ||
@@ -35,6 +37,7 @@ function SidebarBody({
     pathname === "/upload"
   const isSuppliersActive = pathname.startsWith("/suppliers")
   const isReconciliationActive = pathname.startsWith("/reconciliation")
+  const isOrdersActive = pathname.startsWith("/orders")
 
   return (
     <div className="flex flex-col h-full bg-sidebar">
@@ -47,7 +50,7 @@ function SidebarBody({
       <nav className="flex-1 px-2 py-3 space-y-px overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
-          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : item.id === "reconciliation" ? isReconciliationActive : pathname === item.href
+          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : item.id === "reconciliation" ? isReconciliationActive : item.id === "orders" ? isOrdersActive : pathname === item.href
 
           if (item.locked) {
             return (
@@ -81,10 +84,15 @@ function SidebarBody({
               )}
               <Icon className="size-3.5 shrink-0" />
               <span className="flex-1 truncate">{item.label}</span>
-              {/* Invoice count badge on active item */}
-              {isActive && invoiceCount !== undefined && invoiceCount > 0 && (
+              {/* Badge: invoice count on Invoices, active order count on Orders */}
+              {isActive && item.id === "invoices" && invoiceCount !== undefined && invoiceCount > 0 && (
                 <span className="text-[10px] font-semibold tabular-nums px-1.5 min-w-[20px] text-center py-0.5 rounded-full bg-sidebar-primary/15 text-sidebar-primary">
                   {invoiceCount > 99 ? "99+" : invoiceCount}
+                </span>
+              )}
+              {isActive && item.id === "orders" && activeOrderCount !== undefined && activeOrderCount > 0 && (
+                <span className="text-[10px] font-semibold tabular-nums px-1.5 min-w-[20px] text-center py-0.5 rounded-full bg-sidebar-primary/15 text-sidebar-primary">
+                  {activeOrderCount > 99 ? "99+" : activeOrderCount}
                 </span>
               )}
             </Link>
@@ -116,18 +124,18 @@ function SidebarBody({
   )
 }
 
-export function Sidebar({ userEmail, onLogout, open, onClose, invoiceCount }: SidebarProps) {
+export function Sidebar({ userEmail, onLogout, open, onClose, invoiceCount, activeOrderCount }: SidebarProps) {
   return (
     <>
       {/* Desktop: permanent sidebar */}
       <aside className="hidden lg:flex w-60 h-screen flex-col shrink-0 border-r border-sidebar-border">
-        <SidebarBody userEmail={userEmail} onLogout={onLogout} invoiceCount={invoiceCount} />
+        <SidebarBody userEmail={userEmail} onLogout={onLogout} invoiceCount={invoiceCount} activeOrderCount={activeOrderCount} />
       </aside>
 
       {/* Mobile: slide-over drawer */}
       <div className="lg:hidden">
         <Sheet open={open} onClose={onClose}>
-          <SidebarBody userEmail={userEmail} onLogout={onLogout} invoiceCount={invoiceCount} />
+          <SidebarBody userEmail={userEmail} onLogout={onLogout} invoiceCount={invoiceCount} activeOrderCount={activeOrderCount} />
         </Sheet>
       </div>
     </>

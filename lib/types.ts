@@ -120,6 +120,45 @@ export interface ExtractedBankStatementData {
   raw: Record<string, unknown>;
 }
 
+export type OrderType = "sampling" | "production";
+export type OrderStatus = "draft" | "confirmed" | "in_production" | "quality_check" | "shipped" | "delivered" | "cancelled";
+
+export interface Order {
+  id: string;
+  supplier_id: string;
+  reference: string;
+  type: OrderType;
+  status: OrderStatus;
+  quantity: number | null;
+  unit_cost: number | null;
+  currency: string;
+  order_date: string;
+  expected_date: string | null;
+  actual_date: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // joined
+  supplier?: Pick<Supplier, "id" | "business_name" | "country">;
+}
+
+export interface OrderEvent {
+  id: string;
+  order_id: string;
+  status: OrderStatus;
+  note: string | null;
+  event_date: string;
+  created_at: string;
+}
+
+export interface SupplierOrderStats {
+  supplier_id: string;
+  active_count: number;
+  delivered_count: number;
+  avg_lead_days: number | null;
+  on_time_count: number;
+}
+
 export function getQuarterFromDate(dateStr: string): { quarter: Quarter; year: number } | null {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return null;

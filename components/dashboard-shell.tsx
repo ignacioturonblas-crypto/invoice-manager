@@ -14,6 +14,7 @@ interface DashboardShellProps {
 export function DashboardShell({ userEmail, children }: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [invoiceCount, setInvoiceCount] = useState<number | undefined>(undefined)
+  const [activeOrderCount, setActiveOrderCount] = useState<number | undefined>(undefined)
   const router = useRouter()
 
   useEffect(() => {
@@ -21,9 +22,12 @@ export function DashboardShell({ userEmail, children }: DashboardShellProps) {
     supabase
       .from("invoices")
       .select("id", { count: "exact", head: true })
-      .then(({ count }) => {
-        if (count !== null) setInvoiceCount(count)
-      })
+      .then(({ count }) => { if (count !== null) setInvoiceCount(count) })
+    supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .not("status", "in", '("delivered","cancelled")')
+      .then(({ count }) => { if (count !== null) setActiveOrderCount(count) })
   }, [])
 
   async function handleLogout() {
@@ -40,6 +44,7 @@ export function DashboardShell({ userEmail, children }: DashboardShellProps) {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         invoiceCount={invoiceCount}
+        activeOrderCount={activeOrderCount}
       />
       <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
         <TopBar onMenuClick={() => setDrawerOpen(true)} />
