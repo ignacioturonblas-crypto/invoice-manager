@@ -775,7 +775,7 @@ export default function SuppliersPage() {
       product_type: data.product_type || null,
     })
     if (error) {
-      toast.error("Failed to add supplier")
+      toast.error(`Failed to add supplier: ${error.message}`)
     } else {
       toast.success("Supplier added")
       setAddOpen(false)
