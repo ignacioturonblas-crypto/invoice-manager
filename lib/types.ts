@@ -173,3 +173,44 @@ export function getQuarterFromDate(dateStr: string): { quarter: Quarter; year: n
 
   return { quarter, year };
 }
+
+// ─── Invoice Builder ──────────────────────────────────────────────────────────
+
+export type InvoiceDirection = "outgoing" | "incoming";
+
+export interface LineItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+}
+
+export interface CreatedInvoice {
+  id: string;
+  invoice_number: string;
+  invoice_date: string;
+  direction: InvoiceDirection;
+  from_name: string | null;
+  from_vat: string | null;
+  from_address: string | null;
+  from_zip: string | null;
+  from_country: string | null;
+  from_phone: string | null;
+  from_email: string | null;
+  bill_to_name: string | null;
+  bill_to_vat: string | null;
+  bill_to_address: string | null;
+  bill_to_zip: string | null;
+  bill_to_country: string | null;
+  ship_to_name: string | null;
+  ship_to_address: string | null;
+  ship_to_zip: string | null;
+  ship_to_country: string | null;
+  order_reference: string | null;
+  line_items: LineItem[];
+  shipping_amount: number;
+  vat_rate: number;
+  notes: string | null;
+  supplier_id: string | null;
+  created_at: string;
+  updated_at: string;
+}

@@ -19,7 +19,7 @@ const NAV_ITEMS = [
   { id: "invoices", label: "Invoices", href: "/dashboard", icon: FileText, locked: false },
   { id: "suppliers", label: "Suppliers", href: "/suppliers", icon: Building2, locked: false },
   { id: "reconciliation", label: "Reconciliation", href: "/reconciliation", icon: GitMerge, locked: false },
-  { id: "billing", label: "Billing", href: "/billing", icon: CreditCard, locked: true },
+  { id: "billing", label: "Billing", href: "/billing", icon: CreditCard, locked: false },
   { id: "orders", label: "Orders", href: "/orders", icon: Package, locked: false },
   { id: "projects", label: "Project Management", href: "/projects", icon: Briefcase, locked: true },
 ]
@@ -37,6 +37,7 @@ function SidebarBody({
     pathname === "/upload"
   const isSuppliersActive = pathname.startsWith("/suppliers")
   const isReconciliationActive = pathname.startsWith("/reconciliation")
+  const isBillingActive = pathname.startsWith("/billing")
   const isOrdersActive = pathname.startsWith("/orders")
 
   return (
@@ -50,7 +51,7 @@ function SidebarBody({
       <nav className="flex-1 px-2 py-3 space-y-px overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
-          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : item.id === "reconciliation" ? isReconciliationActive : item.id === "orders" ? isOrdersActive : pathname === item.href
+          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : item.id === "reconciliation" ? isReconciliationActive : item.id === "billing" ? isBillingActive : item.id === "orders" ? isOrdersActive : pathname === item.href
 
           if (item.locked) {
             return (
