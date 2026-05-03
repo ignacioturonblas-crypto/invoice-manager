@@ -49,6 +49,7 @@ export interface Supplier {
   contact_person: string | null;
   phone: string | null;
   notes: string | null;
+  product_type: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation"
 function formatSupplierForCopy(s: Supplier): string {
   const lines: string[] = []
   lines.push(`Business Name: ${s.business_name}`)
+  if (s.product_type)     lines.push(`Product Type: ${s.product_type}`)
   if (s.vat_number)       lines.push(`VAT/Business ID: ${s.vat_number}`)
   if (s.address)          lines.push(`Address: ${s.address}`)
   if (s.shipping_address) lines.push(`Shipping Address: ${s.shipping_address}`)
@@ -67,6 +68,7 @@ type SupplierFormData = {
   contact_person: string
   phone: string
   notes: string
+  product_type: string
 }
 
 type CompanyFormData = {
@@ -91,6 +93,7 @@ const BLANK_SUPPLIER: SupplierFormData = {
   contact_person: "",
   phone: "",
   notes: "",
+  product_type: "",
 }
 
 const BLANK_COMPANY: CompanyFormData = {
@@ -521,6 +524,7 @@ function SupplierForm({ initial, onSave, onCancel, saving }: SupplierFormProps) 
           contact_person: initial.contact_person ?? "",
           phone: initial.phone ?? "",
           notes: initial.notes ?? "",
+          product_type: initial.product_type ?? "",
         }
       : { ...BLANK_SUPPLIER }
   )
@@ -543,6 +547,7 @@ function SupplierForm({ initial, onSave, onCancel, saving }: SupplierFormProps) 
     <form onSubmit={handleSubmit} className="space-y-4 mt-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Business Name" {...f("business_name")} required />
+        <Field label="Product Type" {...f("product_type")} placeholder="e.g. Footwear, Packaging, Fabric" />
         <Field label="Business ID / VAT Number" {...f("vat_number")} />
         <Field label="Address" {...f("address")} />
         <Field label="Shipping Address" {...f("shipping_address")} />
@@ -630,7 +635,13 @@ function SupplierRow({ supplier, stats, onEdit, onDelete }: SupplierRowProps) {
           </p>
         )}
       </div>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+      <div className="flex items-center gap-2 ml-auto shrink-0">
+        {supplier.product_type && (
+          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+            {supplier.product_type}
+          </span>
+        )}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           variant="ghost"
           size="icon"
@@ -667,6 +678,7 @@ function SupplierRow({ supplier, stats, onEdit, onDelete }: SupplierRowProps) {
         >
           <Trash2 className="size-3.5" />
         </Button>
+        </div>
       </div>
     </div>
   )
@@ -760,6 +772,7 @@ export default function SuppliersPage() {
       contact_person: data.contact_person || null,
       phone: data.phone || null,
       notes: data.notes || null,
+      product_type: data.product_type || null,
     })
     if (error) {
       toast.error("Failed to add supplier")
@@ -784,6 +797,7 @@ export default function SuppliersPage() {
       contact_person: data.contact_person || null,
       phone: data.phone || null,
       notes: data.notes || null,
+      product_type: data.product_type || null,
     }).eq("id", editTarget.id)
     if (error) {
       toast.error("Failed to update supplier")
