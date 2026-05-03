@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
   Package, Plus, CheckCircle2, AlertCircle, Clock, TrendingUp,
-  ChevronRight, X, Check, Trash2, Loader2,
+  ChevronRight, X, Check, Trash2, Loader2, ExternalLink,
 } from "lucide-react";
 import type { Order, OrderEvent, OrderStatus, OrderType, Supplier } from "@/lib/types";
 
@@ -32,6 +32,26 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
 };
 
 const ACTIVE_STATUSES: OrderStatus[] = ["draft", "confirmed", "in_production", "quality_check", "shipped"];
+
+// Carrier tracking URL templates — {n} replaced with tracking number
+const CARRIER_URLS: Record<string, string> = {
+  DHL:     "https://www.dhl.com/en/express/tracking.html?AWB={n}",
+  FedEx:   "https://www.fedex.com/fedextrack/?trknbr={n}",
+  UPS:     "https://www.ups.com/track?tracknum={n}",
+  GLS:     "https://gls-group.com/track/{n}",
+  SEUR:    "https://www.seur.com/es/particulares/seguimiento-bulto.do?referencia={n}",
+  MRW:     "https://www.mrw.es/seguimiento_envios/Seguimiento.asp?Expedicion={n}",
+  Correos: "https://www.correos.es/ss/Satellite/site/page-seguimiento_envios/sidioma-es_ES?numero={n}",
+  CAINIAO: "https://global.cainiao.com/detail.htm?mailNoList={n}",
+  "4PX":   "https://track.4px.com/#/result/0/{n}",
+  YDH:     "https://www.ydhex.com/track/?no={n}",
+  Other:   "https://www.aftership.com/track/{n}",
+};
+
+function trackingUrl(carrier: string, trackingNumber: string): string {
+  const tpl = CARRIER_URLS[carrier] ?? CARRIER_URLS.Other;
+  return tpl.replace("{n}", encodeURIComponent(trackingNumber));
+}
 
 const chipBase = "px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors cursor-pointer";
 const chipActive = "bg-foreground text-background";
@@ -165,6 +185,7 @@ function OrdersPageInner() {
       unit_cost: order.unit_cost, currency: order.currency,
       order_date: order.order_date, expected_date: order.expected_date,
       actual_date: order.actual_date, notes: order.notes,
+      tracking_number: order.tracking_number, carrier: order.carrier,
     });
     const { data } = await supabase.from("order_events").select("*").eq("order_id", order.id).order("event_date", { ascending: false });
     setEvents((data as OrderEvent[]) ?? []);
@@ -194,6 +215,7 @@ function OrdersPageInner() {
       currency: editForm.currency, order_date: editForm.order_date,
       expected_date: editForm.expected_date || null, actual_date: editForm.actual_date || null,
       notes: editForm.notes || null,
+      tracking_number: editForm.tracking_number || null, carrier: editForm.carrier || null,
     }).eq("id", selected.id);
     setPanelSaving(false);
     if (error) { toast.error("Save failed"); return; }
@@ -471,6 +493,36 @@ function OrdersPageInner() {
                     <input type="date" className={inputClass + " mt-1"} value={editForm.actual_date ?? ""} onChange={(e) => setEditForm((f) => ({ ...f, actual_date: e.target.value }))} />
                   </div>
                 )}
+                <div>
+                  <p className={labelClass}>Shipping</p>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <select
+                      className={inputClass}
+                      value={editForm.carrier ?? ""}
+                      onChange={(e) => setEditForm((f) => ({ ...f, carrier: e.target.value || null }))}
+                    >
+                      <option value="">Carrier</option>
+                      {Object.keys(CARRIER_URLS).map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <input
+                      className={inputClass}
+                      placeholder="Tracking number"
+                      value={editForm.tracking_number ?? ""}
+                      onChange={(e) => setEditForm((f) => ({ ...f, tracking_number: e.target.value || null }))}
+                    />
+                  </div>
+                  {editForm.carrier && editForm.tracking_number && (
+                    <a
+                      href={trackingUrl(editForm.carrier, editForm.tracking_number)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 mt-2 text-[12px] text-primary hover:underline"
+                    >
+                      <ExternalLink className="size-3" />
+                      Track with {editForm.carrier}
+                    </a>
+                  )}
+                </div>
                 <div>
                   <p className={labelClass}>Notes</p>
                   <textarea rows={3} className={inputClass + " mt-1 h-auto py-2 resize-none"} value={editForm.notes ?? ""} onChange={(e) => setEditForm((f) => ({ ...f, notes: e.target.value }))} />

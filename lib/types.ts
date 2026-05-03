@@ -136,6 +136,8 @@ export interface Order {
   expected_date: string | null;
   actual_date: string | null;
   notes: string | null;
+  tracking_number: string | null;
+  carrier: string | null;
   created_at: string;
   updated_at: string;
   // joined
