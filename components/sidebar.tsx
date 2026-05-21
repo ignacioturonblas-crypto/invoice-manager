@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FileText, CreditCard, Package, Briefcase, LogOut, Building2, GitMerge } from "lucide-react"
+import { FileText, CreditCard, Package, Briefcase, LogOut, Building2, GitMerge, Send } from "lucide-react"
 import { Sheet } from "@/components/ui/sheet"
 import { MassioLogo } from "@/components/massio-logo"
 
@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { id: "reconciliation", label: "Reconciliation", href: "/reconciliation", icon: GitMerge, locked: false },
   { id: "billing", label: "Billing", href: "/billing", icon: CreditCard, locked: false },
   { id: "orders", label: "Orders", href: "/orders", icon: Package, locked: false },
+  { id: "outreach", label: "Outreach", href: "/outreach", icon: Send, locked: false },
   { id: "projects", label: "Project Management", href: "/projects", icon: Briefcase, locked: true },
 ]
 
@@ -39,6 +40,7 @@ function SidebarBody({
   const isReconciliationActive = pathname.startsWith("/reconciliation")
   const isBillingActive = pathname.startsWith("/billing")
   const isOrdersActive = pathname.startsWith("/orders")
+  const isOutreachActive = pathname.startsWith("/outreach")
 
   return (
     <div className="flex flex-col h-full bg-sidebar">
@@ -51,7 +53,7 @@ function SidebarBody({
       <nav className="flex-1 px-2 py-3 space-y-px overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
-          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : item.id === "reconciliation" ? isReconciliationActive : item.id === "billing" ? isBillingActive : item.id === "orders" ? isOrdersActive : pathname === item.href
+          const isActive = item.id === "invoices" ? isInvoicesActive : item.id === "suppliers" ? isSuppliersActive : item.id === "reconciliation" ? isReconciliationActive : item.id === "billing" ? isBillingActive : item.id === "orders" ? isOrdersActive : item.id === "outreach" ? isOutreachActive : pathname === item.href
 
           if (item.locked) {
             return (

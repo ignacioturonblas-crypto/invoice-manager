@@ -214,3 +214,87 @@ export interface CreatedInvoice {
   created_at: string;
   updated_at: string;
 }
+
+// ─── Outreach CRM ────────────────────────────────────────────────────────────
+
+export type ContactCategory =
+  | "interior_studio"
+  | "retailer"
+  | "wholesale"
+  | "gallery"
+  | "architect"
+  | "hospitality"
+  | "staging"
+  | "other";
+
+export type ContactStatus =
+  | "new"
+  | "contacted"
+  | "replied"
+  | "client"
+  | "rejected"
+  | "unsubscribed";
+
+export type CampaignStatus = "draft" | "active" | "paused";
+
+export type OutreachStatus =
+  | "pending"
+  | "sent"
+  | "replied"
+  | "converted"
+  | "unsubscribed";
+
+export interface OutreachSearch {
+  id: string;
+  query: string;
+  category: string;
+  city: string | null;
+  country: string;
+  total_found: number;
+  imported_count: number;
+  created_at: string;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  category: ContactCategory;
+  address: string | null;
+  city: string | null;
+  country: string;
+  phone: string | null;
+  website: string | null;
+  email: string | null;
+  google_place_id: string | null;
+  rating: number | null;
+  reviews_count: number | null;
+  source_search_id: string | null;
+  status: ContactStatus;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  category: string | null;
+  wholesale_link: string | null;
+  calendly_link: string | null;
+  status: CampaignStatus;
+  sent_count: number;
+  created_at: string;
+}
+
+export interface ContactOutreach {
+  id: string;
+  contact_id: string;
+  campaign_id: string;
+  email_used: string | null;
+  status: OutreachStatus;
+  sent_at: string | null;
+  replied_at: string | null;
+  notes: string | null;
+  created_at: string;
+}
