@@ -56,8 +56,9 @@ export async function POST(req: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
+        from: process.env.RESEND_FROM_EMAIL ?? "sales@massio.co",
         to: contact.email,
+        reply_to: process.env.RESEND_REPLY_TO ?? "massioconcept@gmail.com",
         subject,
         html,
       });
