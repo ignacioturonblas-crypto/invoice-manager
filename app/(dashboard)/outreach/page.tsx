@@ -137,6 +137,19 @@ function ContactsTab({ onSwitchToSearch }: { onSwitchToSearch: () => void }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detailContact, setDetailContact] = useState<Contact | null>(null);
   const [showCampaignPicker, setShowCampaignPicker] = useState(false);
+  const [scraping, setScraping] = useState(false);
+
+  const scrapeEmails = async () => {
+    setScraping(true);
+    try {
+      const res = await fetch("/api/scrape-emails", { method: "POST" });
+      const data = await res.json();
+      toast.success(`Found ${data.summary.found} emails out of ${data.summary.total} contacts without email`);
+      fetchContacts();
+    } finally {
+      setScraping(false);
+    }
+  };
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
@@ -258,6 +271,15 @@ function ContactsTab({ onSwitchToSearch }: { onSwitchToSearch: () => void }) {
             >
               <Plus size={13} />
               Import
+            </button>
+            <button
+              onClick={scrapeEmails}
+              disabled={scraping}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-border rounded-md hover:bg-muted disabled:opacity-50"
+              title="Find emails for contacts that have a website but no email"
+            >
+              {scraping ? <Loader2 size={13} className="animate-spin" /> : <Mail size={13} />}
+              {scraping ? "Scraping..." : "Find emails"}
             </button>
           </div>
         </div>
